@@ -137,28 +137,6 @@
         }
 
         /* ── 豆芽 ── */
-        #sprout-wrap {
-            position: absolute;
-            bottom: 38px;
-            left: 50%;
-            transform: translateX(-50%);
-            pointer-events: none;
-            z-index: 10;
-            display: flex;
-            gap: 18px;
-            align-items: flex-end;
-        }
-        .sprout {
-            transform-origin: bottom center;
-            animation: sway 2.8s ease-in-out infinite;
-        }
-        .sprout:nth-child(2) { animation-delay: -0.9s; animation-duration: 3.2s; }
-        .sprout:nth-child(3) { animation-delay: -1.8s; animation-duration: 2.5s; }
-        @keyframes sway {
-            0%,100% { transform: rotate(-5deg); }
-            50%     { transform: rotate(5deg); }
-        }
-
         /* ── 豆芽 ── */
         #sprout-wrap {
             position: absolute;
@@ -222,74 +200,46 @@
     <div id="combo"></div>
 
     <div id="tomato-wrap">
-        <svg id="tomato-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <radialGradient id="tg" cx="38%" cy="32%" r="65%">
-                    <stop offset="0%"   stop-color="#ff8c6a"/>
-                    <stop offset="40%"  stop-color="#e8321a"/>
-                    <stop offset="100%" stop-color="#8b1000"/>
-                </radialGradient>
-                <radialGradient id="shine" cx="35%" cy="28%" r="30%">
-                    <stop offset="0%"  stop-color="rgba(255,255,255,0.55)"/>
-                    <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-                </radialGradient>
-                <filter id="soft">
-                    <feGaussianBlur stdDeviation="1.5"/>
-                </filter>
-            </defs>
-            <ellipse cx="100" cy="178" rx="52" ry="10" fill="rgba(0,0,0,0.3)" filter="url(#soft)"/>
-            <circle cx="100" cy="108" r="75" fill="url(#tg)"/>
-            <ellipse cx="78" cy="80" rx="28" ry="20" fill="url(#shine)"/>
-            <circle cx="68" cy="74" r="7" fill="rgba(255,255,255,0.25)"/>
-            <ellipse cx="100" cy="178" rx="18" ry="6" fill="rgba(80,0,0,0.25)"/>
-            <path d="M100 36 C98 28 90 18 84 14" stroke="#2d7a1f" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-            <path d="M100 36 C112 22 126 24 128 32 C118 30 108 38 100 36Z" fill="#3dba28"/>
-            <path d="M100 36 C88 20 72 22 70 32  C80 30 92 38 100 36Z" fill="#4dd634"/>
-            <path d="M100 36 C105 18 118 12 124 18 C114 20 106 32 100 36Z" fill="#2ea01e"/>
-            <path d="M100 36 C95 16 82 10 76 16  C86 18 96 32 100 36Z" fill="#57e040"/>
-            <path d="M100 36 C102 24 112 20 116 24 C110 26 103 33 100 36Z" fill="#5af048"/>
-            <path d="M100 36 C114 23 125 25 126 30" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-            <path d="M100 108 C100 60 100 60 100 40" stroke="rgba(80,0,0,0.12)" stroke-width="2" fill="none"/>
-            <path d="M100 108 C130 75 140 70 140 55" stroke="rgba(80,0,0,0.1)" stroke-width="1.5" fill="none"/>
-            <path d="M100 108 C70 75 60 70 60 55"   stroke="rgba(80,0,0,0.1)" stroke-width="1.5" fill="none"/>
+        <svg id="tomato-svg" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+            <!-- OpenMoji 1F345 tomato (CC BY-SA 4.0 / hfg-gmuend) -->
+            <ellipse cx="35.8248" cy="37.5975" rx="25.0149" ry="22.3817" fill="#EA5A47"/>
+            <path fill="#D22F27" d="M60.5279,37.5975c0,12.3648-10.89,22.3817-24.703,22.3817c17.4001-4.1037,31.9603-32.9321,0-44.7634c5.0852,0,9.8164,1.3576,13.7651,3.6901C56.3674,22.9092,60.5279,29.7846,60.5279,37.5975z"/>
+            <path fill="#B1CC33" d="M46.3245,15.8489c-0.384,1.3824-0.9937,3.0311-2.4357,4.235C38,25,30.2513,23.2876,26.8173,20.0838c-1.3604-1.2836-2.0407-2.8525-2.4246-4.235c-0.6364-2.2821-0.3621-4.1691-0.3621-4.1691s2.2821-0.3291,4.8384,0.5815c0.8668,0.3072,1.7664,0.757,2.6222,1.4044c0.4827-3.3682,2.7319-5.6174,3.5547-6.3415l0.3072-0.2523l0.3072,0.2523c0.8229,0.7242,3.0721,2.9733,3.5548,6.3415c0.8557-0.6473,1.7554-1.0971,2.6221-1.4044c2.5564-0.9106,4.8384-0.5815,4.8384-0.5815S46.9609,13.5668,46.3245,15.8489z"/>
+            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M50.3073,19.3462c6.3743,4.0565,10.5324,10.7195,10.5324,18.2513c0,12.3611-11.1995,22.3817-25.0149,22.3817S10.81,49.9586,10.81,37.5975c0-7.3745,3.9861-13.9159,10.1357-17.9936"/>
+            <path fill="none" stroke="#000" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M46.3245,15.8489c-0.384,1.3824-0.9937,3.0311-2.4357,4.235C38,25,30.2513,23.2876,26.8173,20.0838c-1.3604-1.2836-2.0407-2.8525-2.4246-4.235c-0.6364-2.2821-0.3621-4.1691-0.3621-4.1691s2.2821-0.3291,4.8384,0.5815c0.8668,0.3072,1.7664,0.757,2.6222,1.4044c0.4827-3.3682,2.7319-5.6174,3.5547-6.3415l0.3072-0.2523l0.3072,0.2523c0.8229,0.7242,3.0721,2.9733,3.5548,6.3415c0.8557-0.6473,1.7554-1.0971,2.6221-1.4044c2.5564-0.9106,4.8384-0.5815,4.8384-0.5815S46.9609,13.5668,46.3245,15.8489z"/>
         </svg>
     </div>
 
-    <!-- 豆芽装饰 -->
+    <!-- 黄豆芽（OpenMoji 1F331 改色，CC BY-SA 4.0 / hfg-gmuend） -->
     <div id="sprout-wrap">
-        <!-- 豆芽 1（矮） -->
-        <svg class="sprout" width="36" height="72" viewBox="0 0 36 72" xmlns="http://www.w3.org/2000/svg">
-            <!-- 茎 -->
-            <path d="M18 70 C18 55 16 42 18 28" stroke="#7ec850" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-            <!-- 弯钩 -->
-            <path d="M18 28 C18 16 26 10 30 14" stroke="#7ec850" stroke-width="3" stroke-linecap="round" fill="none"/>
-            <!-- 头豆 -->
-            <ellipse cx="30" cy="13" rx="5.5" ry="5" fill="#c8e86a" stroke="#8dbf3a" stroke-width="1"/>
-            <ellipse cx="30" cy="11.5" rx="3" ry="2" fill="rgba(255,255,255,0.3)"/>
-            <!-- 小叶 -->
-            <path d="M18 42 C10 36 6 40 8 46 C12 46 16 44 18 42Z" fill="#5dc93a" opacity="0.85"/>
-            <!-- 根 -->
-            <ellipse cx="18" cy="71" rx="7" ry="2.5" fill="rgba(100,180,50,0.25)"/>
+        <!-- 黄豆芽 1（标准） -->
+        <svg class="sprout" width="38" height="76" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#A88C20" d="M22.3618,19.992c4.067,1.3991,6.0978,6.2158,6.0978,6.2158s-4.5639,2.5478-8.6315,1.149s-6.0978-6.2158-6.0978-6.2158S18.2963,18.5952,22.3618,19.992z"/>
+            <path fill="#D4B830" d="M51.935,35.8718c4.1996,0.9278,6.7648,5.4824,6.7648,5.4824s-4.2448,3.05-8.4449,2.1226s-6.7648-5.4824-6.7648-5.4824S47.7371,34.9462,51.935,35.8718z"/>
+            <polyline fill="none" stroke="#c8a828" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" points="36,63.1661 36,51.1661 31,29.1661"/>
+            <line x1="36" x2="41" y1="51.1661" y2="41.1661" fill="none" stroke="#c8a828" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"/>
+            <path fill="none" stroke="#7a6010" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M22.3618,19.992c4.067,1.3991,6.0978,6.2158,6.0978,6.2158s-4.5639,2.5478-8.6315,1.149s-6.0978-6.2158-6.0978-6.2158S18.2963,18.5952,22.3618,19.992z"/>
+            <path fill="none" stroke="#7a6010" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M51.935,35.8718c4.1996,0.9278,6.7648,5.4824,6.7648,5.4824s-4.2448,3.05-8.4449,2.1226s-6.7648-5.4824-6.7648-5.4824S47.7371,34.9462,51.935,35.8718z"/>
         </svg>
-        <!-- 豆芽 2（高） -->
-        <svg class="sprout" width="40" height="88" viewBox="0 0 40 88" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 86 C20 68 18 50 20 32" stroke="#6dbb40" stroke-width="4" stroke-linecap="round" fill="none"/>
-            <path d="M20 32 C20 18 30 10 35 15" stroke="#6dbb40" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-            <ellipse cx="35" cy="14" rx="6.5" ry="6" fill="#d4ef72" stroke="#88c030" stroke-width="1.2"/>
-            <ellipse cx="35" cy="12" rx="3.5" ry="2.2" fill="rgba(255,255,255,0.32)"/>
-            <!-- 两片小叶 -->
-            <path d="M20 54 C10 46 5 52 8 58 C13 59 18 56 20 54Z" fill="#52c230" opacity="0.9"/>
-            <path d="M20 40 C28 33 33 37 31 43 C27 44 22 41 20 40Z" fill="#52c230" opacity="0.75"/>
-            <ellipse cx="20" cy="87" rx="8" ry="3" fill="rgba(100,180,50,0.25)"/>
+        <!-- 黄豆芽 2（大） -->
+        <svg class="sprout" width="48" height="96" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#A88C20" d="M22.3618,19.992c4.067,1.3991,6.0978,6.2158,6.0978,6.2158s-4.5639,2.5478-8.6315,1.149s-6.0978-6.2158-6.0978-6.2158S18.2963,18.5952,22.3618,19.992z"/>
+            <path fill="#EAC830" d="M51.935,35.8718c4.1996,0.9278,6.7648,5.4824,6.7648,5.4824s-4.2448,3.05-8.4449,2.1226s-6.7648-5.4824-6.7648-5.4824S47.7371,34.9462,51.935,35.8718z"/>
+            <polyline fill="none" stroke="#d4b430" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" points="36,63.1661 36,51.1661 31,29.1661"/>
+            <line x1="36" x2="41" y1="51.1661" y2="41.1661" fill="none" stroke="#d4b430" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+            <path fill="none" stroke="#7a6010" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22.3618,19.992c4.067,1.3991,6.0978,6.2158,6.0978,6.2158s-4.5639,2.5478-8.6315,1.149s-6.0978-6.2158-6.0978-6.2158S18.2963,18.5952,22.3618,19.992z"/>
+            <path fill="none" stroke="#7a6010" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M51.935,35.8718c4.1996,0.9278,6.7648,5.4824,6.7648,5.4824s-4.2448,3.05-8.4449,2.1226s-6.7648-5.4824-6.7648-5.4824S47.7371,34.9462,51.935,35.8718z"/>
         </svg>
-        <!-- 豆芽 3（矮偏） -->
-        <svg class="sprout" width="32" height="64" viewBox="0 0 32 64" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16 62 C16 50 14 38 15 24" stroke="#90d458" stroke-width="3" stroke-linecap="round" fill="none"/>
-            <path d="M15 24 C14 14 6 8 3 12" stroke="#90d458" stroke-width="2.8" stroke-linecap="round" fill="none"/>
-            <ellipse cx="3" cy="11" rx="5" ry="4.5" fill="#bfe860" stroke="#78b830" stroke-width="1"/>
-            <ellipse cx="3" cy="9.5" rx="2.6" ry="1.8" fill="rgba(255,255,255,0.28)"/>
-            <path d="M16 40 C22 34 26 38 24 43 C21 44 17 42 16 40Z" fill="#68cc3a" opacity="0.8"/>
-            <ellipse cx="16" cy="63" rx="6" ry="2" fill="rgba(100,180,50,0.22)"/>
+        <!-- 黄豆芽 3（镜像翻转） -->
+        <svg class="sprout" width="38" height="76" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg" style="transform-origin:bottom center">
+            <g transform="scale(-1,1) translate(-72,0)">
+                <path fill="#A88C20" d="M22.3618,19.992c4.067,1.3991,6.0978,6.2158,6.0978,6.2158s-4.5639,2.5478-8.6315,1.149s-6.0978-6.2158-6.0978-6.2158S18.2963,18.5952,22.3618,19.992z"/>
+                <path fill="#C8A428" d="M51.935,35.8718c4.1996,0.9278,6.7648,5.4824,6.7648,5.4824s-4.2448,3.05-8.4449,2.1226s-6.7648-5.4824-6.7648-5.4824S47.7371,34.9462,51.935,35.8718z"/>
+                <polyline fill="none" stroke="#b89820" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" points="36,63.1661 36,51.1661 31,29.1661"/>
+                <line x1="36" x2="41" y1="51.1661" y2="41.1661" fill="none" stroke="#b89820" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"/>
+                <path fill="none" stroke="#7a6010" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M22.3618,19.992c4.067,1.3991,6.0978,6.2158,6.0978,6.2158s-4.5639,2.5478-8.6315,1.149s-6.0978-6.2158-6.0978-6.2158S18.2963,18.5952,22.3618,19.992z"/>
+                <path fill="none" stroke="#7a6010" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M51.935,35.8718c4.1996,0.9278,6.7648,5.4824,6.7648,5.4824s-4.2448,3.05-8.4449,2.1226s-6.7648-5.4824-6.7648-5.4824S47.7371,34.9462,51.935,35.8718z"/>
+            </g>
         </svg>
     </div>
 
