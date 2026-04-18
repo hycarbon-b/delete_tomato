@@ -154,13 +154,48 @@
         }
         .sprout {
             transform-origin: bottom center;
-            animation: sway 2.8s ease-in-out infinite;
+            animation: sprout-dance1 2.6s ease-in-out infinite;
         }
-        .sprout:nth-child(2) { animation-delay: -0.9s; animation-duration: 3.2s; }
-        .sprout:nth-child(3) { animation-delay: -1.8s; animation-duration: 2.5s; }
-        @keyframes sway {
-            0%,100% { transform: rotate(-5deg); }
-            50%     { transform: rotate(5deg); }
+        .sprout:nth-child(2) {
+            animation-name: sprout-dance2;
+            animation-duration: 2.1s;
+            animation-delay: -0.7s;
+        }
+        .sprout:nth-child(3) {
+            animation-name: sprout-dance3;
+            animation-duration: 1.9s;
+            animation-delay: -1.3s;
+        }
+
+        /* 豆芽1：扭腰跳跃 */
+        @keyframes sprout-dance1 {
+            0%   { transform: rotate(-6deg) translateY(0);    }
+            15%  { transform: rotate(4deg)  translateY(-8px); }
+            30%  { transform: rotate(-8deg) translateY(-14px);}
+            45%  { transform: rotate(6deg)  translateY(-6px); }
+            60%  { transform: rotate(-4deg) translateY(-10px);}
+            75%  { transform: rotate(7deg)  translateY(-4px); }
+            100% { transform: rotate(-6deg) translateY(0);    }
+        }
+        /* 豆芽2：弹跳点头 */
+        @keyframes sprout-dance2 {
+            0%   { transform: translateY(0)     scaleY(1)    rotate(0deg);  }
+            20%  { transform: translateY(-16px) scaleY(1.08) rotate(-5deg); }
+            35%  { transform: translateY(-4px)  scaleY(0.95) rotate(3deg);  }
+            55%  { transform: translateY(-20px) scaleY(1.1)  rotate(5deg);  }
+            70%  { transform: translateY(-2px)  scaleY(0.93) rotate(-4deg); }
+            85%  { transform: translateY(-10px) scaleY(1.04) rotate(2deg);  }
+            100% { transform: translateY(0)     scaleY(1)    rotate(0deg);  }
+        }
+        /* 豆芽3：左右蹦跳 */
+        @keyframes sprout-dance3 {
+            0%   { transform: rotate(5deg)  translateY(0);    }
+            20%  { transform: rotate(-9deg) translateY(-12px);}
+            40%  { transform: rotate(7deg)  translateY(-18px);}
+            55%  { transform: rotate(-5deg) translateY(-8px); }
+            70%  { transform: rotate(8deg)  translateY(-14px);}
+            85%  { transform: rotate(-6deg) translateY(-4px); }
+            100% { transform: rotate(5deg)  translateY(0);    }
         }
 
         /* ── 连击提示 ── */
