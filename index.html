@@ -146,6 +146,10 @@
             align-items: flex-end;
         }
         .sprout {
+            pointer-events: auto;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
             transform-origin: bottom center;
             animation: sprout-dance1 2.6s ease-in-out infinite;
         }
@@ -320,7 +324,7 @@
             this.vy = Math.sin(angle) * speed - (type === 'spark' ? 4 : 2);
             this.gravity = type === 'spark' ? 0.25 : 0.35;
             this.life = 1;
-            const decay = { chunk: 0.018, juice: 0.025, seed: 0.022, spark: 0.03 };
+            const decay = { chunk: 0.018, juice: 0.025, seed: 0.022, spark: 0.03, soybean: 0.016, greenbean: 0.018 };
             this.decay = decay[type] + Math.random() * 0.012;
             this.rotation = Math.random() * Math.PI * 2;
             this.rotSpeed = (Math.random() - 0.5) * 0.2;
@@ -334,6 +338,16 @@
                 this.size = 3 + Math.random() * 6;
             } else if (type === 'seed') {
                 this.color = '#f0d070';
+                this.size = 4 + Math.random() * 4;
+            } else if (type === 'soybean') {
+                // 黄豆：饱满椭圆，米黄色
+                this.color = Math.random() < 0.5 ? '#f0d060' : '#e8c840';
+                this.hilite = 'rgba(255,255,200,0.55)';
+                this.size = 6 + Math.random() * 5;
+            } else if (type === 'greenbean') {
+                // 绿豆：小圆豆，深绿/浅绿
+                this.color = Math.random() < 0.5 ? '#4a9e30' : '#6ec244';
+                this.hilite = 'rgba(180,255,120,0.45)';
                 this.size = 4 + Math.random() * 4;
             } else {
                 const hue = Math.random() < 0.5 ? 30 + Math.random()*30 : Math.random()*20;
@@ -376,6 +390,17 @@
                 c.translate(this.x, this.y); c.rotate(this.rotation);
                 c.beginPath(); c.ellipse(0, 0, this.size*0.4, this.size*0.9, 0, 0, Math.PI*2);
                 c.fillStyle = this.color; c.fill();
+            } else if (this.type === 'soybean' || this.type === 'greenbean') {
+                c.translate(this.x, this.y); c.rotate(this.rotation);
+                // 豆子主体
+                c.beginPath();
+                c.ellipse(0, 0, this.size * 0.58, this.size * 0.72, 0, 0, Math.PI * 2);
+                c.fillStyle = this.color; c.fill();
+                c.strokeStyle = 'rgba(0,0,0,0.28)'; c.lineWidth = 0.8; c.stroke();
+                // 高光
+                c.beginPath();
+                c.ellipse(-this.size*0.15, -this.size*0.2, this.size*0.22, this.size*0.16, -0.6, 0, Math.PI*2);
+                c.fillStyle = this.hilite; c.fill();
             } else {
                 c.translate(this.x, this.y); c.rotate(this.rotation);
                 c.beginPath();
@@ -516,6 +541,22 @@
         const local = toLocal(e.clientX, e.clientY);
         for (let i=0;i<12;i++) particles.push(new Particle(local.x,local.y,'spark'));
         for (let i=0;i<6;i++)  particles.push(new Particle(local.x,local.y,'juice'));
+    });
+
+    // 豆芽被点击时爆出黄豆和绿豆
+    document.querySelectorAll('.sprout').forEach(sprout => {
+        sprout.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const rect = sprout.getBoundingClientRect();
+            const local = toLocal(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            for (let i = 0; i < 10; i++) particles.push(new Particle(local.x, local.y, 'soybean'));
+            for (let i = 0; i < 10; i++) particles.push(new Particle(local.x, local.y, 'greenbean'));
+            for (let i = 0; i < 8;  i++) particles.push(new Particle(local.x, local.y, 'spark'));
+            // 豆芽被弹飞的抖动
+            sprout.style.transition = 'transform 0.1s ease';
+            sprout.style.transform = 'scale(0.7) rotate(20deg)';
+            setTimeout(() => { sprout.style.transform = ''; sprout.style.transition = ''; }, 120);
+        });
     });
 })();
 </script>
