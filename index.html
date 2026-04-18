@@ -79,18 +79,11 @@
         #tomato-wrap:hover {
             filter: drop-shadow(0 0 50px rgba(255,80,50,0.95));
         }
-        #tomato-wrap:active { transform: translate(-50%, -50%) scale(0.93); }
-
         /* ── 番茄 SVG ── */
         #tomato-svg {
             width: 150px;
             height: 150px;
-            animation: float 3s ease-in-out infinite;
             display: block;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(-2deg); }
-            50%       { transform: translateY(-12px) rotate(2deg); }
         }
 
         /* ── 摇晃动画 ── */
@@ -420,13 +413,36 @@
         }
     }
 
-    const loop = () => {
+    // ── 番茄神经质移动 ──
+    let tmX = 0, tmY = 0, tmR = 0;       // 当前插值位置
+    let tmTX = 0, tmTY = 0, tmTR = 0;   // 目标
+    let tmLerp = 0.04;
+    let tmNextAt = 0;
+    function tickTomato(now) {
+        if (now >= tmNextAt) {
+            const crazy = Math.random() < 0.44;  // 44% 概率发神经
+            const range = crazy ? 72 : 26;
+            tmTX = (Math.random() - 0.5) * range * 2;
+            tmTY = (Math.random() - 0.5) * range * 2;
+            tmTR = (Math.random() - 0.5) * (crazy ? 50 : 16);
+            tmLerp = crazy ? (0.15 + Math.random() * 0.3) : (0.022 + Math.random() * 0.038);
+            tmNextAt = now + (crazy ? 60 + Math.random() * 220 : 700 + Math.random() * 2200);
+        }
+        tmX += (tmTX - tmX) * tmLerp;
+        tmY += (tmTY - tmY) * tmLerp;
+        tmR += (tmTR - tmR) * tmLerp;
+        wrap.style.transform =
+            `translate(calc(-50% + ${tmX.toFixed(2)}px), calc(-50% + ${tmY.toFixed(2)}px)) rotate(${tmR.toFixed(2)}deg)`;
+    }
+
+    const loop = (now) => {
         ctx.clearRect(0, 0, W, H);
         particles  = particles.filter(p  => { p.update();  p.draw(ctx);  return p.life > 0; });
         shockwaves = shockwaves.filter(s => { s.update(); s.draw(ctx); return s.life > 0; });
+        tickTomato(now);
         requestAnimationFrame(loop);
     };
-    loop();
+    requestAnimationFrame(loop);
 
     const explode = (lx, ly) => {
         for (let i=0;i<28;i++) particles.push(new Particle(lx,ly,'chunk'));
@@ -469,7 +485,11 @@
         }, 1500);
     };
 
+    // 被点到时立即惊吓乱窜
+    const scareTomato = () => { tmNextAt = 0; tmLerp = 0.35; };
+
     wrap.addEventListener('click', (e) => {
+        scareTomato();
         const rect = svg.getBoundingClientRect();
         const local = toLocal(rect.left + rect.width/2, rect.top + rect.height/2);
 
