@@ -149,7 +149,6 @@
             pointer-events: auto;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
-        }
             transform-origin: bottom center;
             animation: sprout-dance1 2.6s ease-in-out infinite;
         }
@@ -162,6 +161,17 @@
             animation-name: sprout-dance3;
             animation-duration: 1.9s;
             animation-delay: -1.3s;
+        }
+        .sprout-jumping {
+            animation: sprout-jump 0.5s cubic-bezier(0.22,1.2,0.36,1) forwards !important;
+        }
+        @keyframes sprout-jump {
+            0%   { transform: scaleX(1.2)  scaleY(0.7) translateY(0);     }
+            25%  { transform: scaleX(0.85) scaleY(1.3) translateY(-40px) rotate(-10deg); }
+            55%  { transform: scaleX(0.9)  scaleY(1.2) translateY(-52px) rotate(12deg);  }
+            75%  { transform: scaleX(1.05) scaleY(0.95) translateY(-20px) rotate(-4deg); }
+            90%  { transform: scaleX(1.1)  scaleY(0.8) translateY(-4px)  rotate(2deg);  }
+            100% { transform: scaleX(1)    scaleY(1)   translateY(0)     rotate(0deg);  }
         }
 
         /* 豆芽1：扭腰跳跃 */
@@ -443,21 +453,83 @@
     let tmTX = 0, tmTY = 0, tmTR = 0;   // 目标
     let tmLerp = 0.04;
     let tmNextAt = 0;
+    let frenzyUntil = 0;  // 发疯模式结束时间
+    let frenzyTimer = null;
+
     function tickTomato(now) {
+        const insane = now < frenzyUntil;
         if (now >= tmNextAt) {
-            const crazy = Math.random() < 0.44;  // 44% 概率发神经
-            const range = crazy ? 72 : 26;
+            const crazy = insane || Math.random() < 0.44;
+            const range = insane ? 110 : (crazy ? 72 : 26);
             tmTX = (Math.random() - 0.5) * range * 2;
             tmTY = (Math.random() - 0.5) * range * 2;
-            tmTR = (Math.random() - 0.5) * (crazy ? 50 : 16);
-            tmLerp = crazy ? (0.15 + Math.random() * 0.3) : (0.022 + Math.random() * 0.038);
-            tmNextAt = now + (crazy ? 60 + Math.random() * 220 : 700 + Math.random() * 2200);
+            tmTR = (Math.random() - 0.5) * (insane ? 90 : crazy ? 50 : 16);
+            tmLerp = insane ? (0.35 + Math.random() * 0.45) : (crazy ? (0.15 + Math.random() * 0.3) : (0.022 + Math.random() * 0.038));
+            tmNextAt = now + (insane ? 30 + Math.random() * 80 : crazy ? 60 + Math.random() * 220 : 700 + Math.random() * 2200);
         }
         tmX += (tmTX - tmX) * tmLerp;
         tmY += (tmTY - tmY) * tmLerp;
         tmR += (tmTR - tmR) * tmLerp;
         wrap.style.transform =
             `translate(calc(-50% + ${tmX.toFixed(2)}px), calc(-50% + ${tmY.toFixed(2)}px)) rotate(${tmR.toFixed(2)}deg)`;
+    }
+
+    // 发疯倒计时标签
+    const frenzyLabel = (() => {
+        const el = document.createElement('div');
+        el.id = 'frenzy-label';
+        el.style.cssText = `
+            position:absolute; top:80px; left:50%; transform:translateX(-50%);
+            font-size:20px; font-weight:900; color:#ff2200; letter-spacing:2px;
+            text-shadow:0 0 18px #ff4400, 0 0 40px #ff0000;
+            pointer-events:none; z-index:200; display:none;
+            animation: frenzy-pulse 0.25s ease-in-out infinite alternate;
+        `;
+        el.textContent = '🤪 发疯中！';
+        app.appendChild(el);
+        return el;
+    })();
+
+    // 在 <style> 里动态插入 frenzy-pulse keyframe
+    const frenzyStyle = document.createElement('style');
+    frenzyStyle.textContent = `@keyframes frenzy-pulse {
+        from { transform: translateX(-50%) scale(1) rotate(-3deg); filter: hue-rotate(0deg); }
+        to   { transform: translateX(-50%) scale(1.15) rotate(3deg); filter: hue-rotate(60deg); }
+    }`;
+    document.head.appendChild(frenzyStyle);
+
+    function startFrenzy(now) {
+        frenzyUntil = now + 5000;
+        frenzyLabel.style.display = 'block';
+        clearTimeout(frenzyTimer);
+        // 倒计时更新
+        let remaining = 5;
+        const tick = () => {
+            frenzyLabel.textContent = `🤪 发疯中！${remaining}s`;
+            remaining--;
+            if (remaining >= 0) frenzyTimer = setTimeout(tick, 1000);
+            else { frenzyLabel.style.display = 'none'; }
+        };
+        tick();
+        // 发疯音效：高速噪声扫频
+        sndFrenzy();
+    }
+
+    function sndFrenzy() {
+        resume();
+        const t = ac.currentTime;
+        const osc = ac.createOscillator(); osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(80, t);
+        osc.frequency.linearRampToValueAtTime(800, t + 0.4);
+        osc.frequency.exponentialRampToValueAtTime(200, t + 0.8);
+        osc.frequency.linearRampToValueAtTime(1200, t + 1.2);
+        const g = ac.createGain(); g.gain.setValueAtTime(0.18, t); g.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
+        const dist = ac.createWaveShaper();
+        const curve = new Float32Array(256);
+        for (let i = 0; i < 256; i++) { const x = (i * 2) / 256 - 1; curve[i] = (Math.PI + 200) * x / (Math.PI + 200 * Math.abs(x)); }
+        dist.curve = curve;
+        osc.connect(dist); dist.connect(g); g.connect(ac.destination);
+        osc.start(t); osc.stop(t + 1.4);
     }
 
     const loop = (now) => {
@@ -510,11 +582,12 @@
         }, 1500);
     };
 
-    // 被点到时立即惊吓乱窜
-    const scareTomato = () => { tmNextAt = 0; tmLerp = 0.35; };
+    // 被点到时立即惊吓乱窜，30% 触发发疯5s
+    const scareTomato = (now) => { tmNextAt = 0; tmLerp = 0.35; if (Math.random() < 0.3 && now < frenzyUntil === false) startFrenzy(now); };
 
     wrap.addEventListener('click', (e) => {
-        scareTomato();
+        scareTomato(performance.now());
+        sndExplode();
         const rect = svg.getBoundingClientRect();
         const local = toLocal(rect.left + rect.width/2, rect.top + rect.height/2);
 
@@ -541,7 +614,59 @@
         const local = toLocal(e.clientX, e.clientY);
         for (let i=0;i<12;i++) particles.push(new Particle(local.x,local.y,'spark'));
         for (let i=0;i<6;i++)  particles.push(new Particle(local.x,local.y,'juice'));
+        sndSpark();
     });
+
+    // ── 音效引擎（Web Audio API） ──
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const resume = () => { if (ac.state === 'suspended') ac.resume(); };
+
+    // 番茄爆炸音：低频噼啪 + 短噪声冲击
+    function sndExplode() {
+        resume();
+        const t = ac.currentTime;
+        // 冲击噪声
+        const buf = ac.createBuffer(1, ac.sampleRate * 0.18, ac.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 1.5);
+        const src = ac.createBufferSource(); src.buffer = buf;
+        const flt = ac.createBiquadFilter(); flt.type = 'lowpass'; flt.frequency.value = 400;
+        const g = ac.createGain(); g.gain.setValueAtTime(0.6, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+        src.connect(flt); flt.connect(g); g.connect(ac.destination); src.start(t);
+        // 低音 thud
+        const osc = ac.createOscillator(); osc.type = 'sine';
+        osc.frequency.setValueAtTime(160, t); osc.frequency.exponentialRampToValueAtTime(40, t + 0.15);
+        const g2 = ac.createGain(); g2.gain.setValueAtTime(0.5, t); g2.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+        osc.connect(g2); g2.connect(ac.destination); osc.start(t); osc.stop(t + 0.15);
+    }
+
+    // 豆芽跳跃音：卡通 boing 弹跳
+    function sndBoing() {
+        resume();
+        const t = ac.currentTime;
+        const osc = ac.createOscillator(); osc.type = 'sine';
+        osc.frequency.setValueAtTime(220, t);
+        osc.frequency.exponentialRampToValueAtTime(660, t + 0.08);
+        osc.frequency.exponentialRampToValueAtTime(300, t + 0.22);
+        const g = ac.createGain(); g.gain.setValueAtTime(0.35, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+        osc.connect(g); g.connect(ac.destination); osc.start(t); osc.stop(t + 0.28);
+        // 豆子弹出小音
+        const osc2 = ac.createOscillator(); osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(800, t + 0.05); osc2.frequency.exponentialRampToValueAtTime(300, t + 0.2);
+        const g2 = ac.createGain(); g2.gain.setValueAtTime(0.18, t + 0.05); g2.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+        osc2.connect(g2); g2.connect(ac.destination); osc2.start(t + 0.05); osc2.stop(t + 0.22);
+    }
+
+    // 空白处点击：小火花音
+    function sndSpark() {
+        resume();
+        const t = ac.currentTime;
+        const osc = ac.createOscillator(); osc.type = 'square';
+        osc.frequency.setValueAtTime(1200 + Math.random() * 600, t);
+        osc.frequency.exponentialRampToValueAtTime(400, t + 0.06);
+        const g = ac.createGain(); g.gain.setValueAtTime(0.08, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+        osc.connect(g); g.connect(ac.destination); osc.start(t); osc.stop(t + 0.06);
+    }
 
     // 豆芽被点击时爆出黄豆和绿豆
     document.querySelectorAll('.sprout').forEach(sprout => {
@@ -552,10 +677,12 @@
             for (let i = 0; i < 10; i++) particles.push(new Particle(local.x, local.y, 'soybean'));
             for (let i = 0; i < 10; i++) particles.push(new Particle(local.x, local.y, 'greenbean'));
             for (let i = 0; i < 8;  i++) particles.push(new Particle(local.x, local.y, 'spark'));
-            // 豆芽被弹飞的抖动
-            sprout.style.transition = 'transform 0.1s ease';
-            sprout.style.transform = 'scale(0.7) rotate(20deg)';
-            setTimeout(() => { sprout.style.transform = ''; sprout.style.transition = ''; }, 120);
+            sndBoing();
+            // 用跳跃动画类代替 inline style
+            sprout.classList.remove('sprout-jumping');
+            void sprout.offsetWidth;
+            sprout.classList.add('sprout-jumping');
+            sprout.addEventListener('animationend', () => sprout.classList.remove('sprout-jumping'), { once: true });
         });
     });
 })();
