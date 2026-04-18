@@ -529,7 +529,7 @@
         const el = document.createElement('div');
         el.id = 'frenzy-label';
         el.style.cssText = `
-            position:absolute; top:82px; left:calc(50% - 130px); transform:none;
+            position:absolute; top:50%; left:52px; transform:translateY(-50%);
             font-size:18px; font-weight:900; color:#ff3a10; letter-spacing:3px;
             text-shadow:0 0 16px #ff5500, 0 0 36px rgba(255,60,0,0.6);
             pointer-events:none; z-index:200; display:none;
@@ -543,8 +543,8 @@
     // 在 <style> 里动态插入 frenzy-pulse keyframe
     const frenzyStyle = document.createElement('style');
     frenzyStyle.textContent = `@keyframes frenzy-pulse {
-        from { transform: scale(1) rotate(-3deg); filter: hue-rotate(0deg); }
-        to   { transform: scale(1.15) rotate(3deg); filter: hue-rotate(60deg); }
+        from { transform: translateY(-50%) scale(1) rotate(-3deg); filter: hue-rotate(0deg); }
+        to   { transform: translateY(-50%) scale(1.15) rotate(3deg); filter: hue-rotate(60deg); }
     }`;
     document.head.appendChild(frenzyStyle);
 
