@@ -205,6 +205,23 @@
             100% { transform: rotate(5deg)  translateY(0);    }
         }
 
+        /* ── 音符 ── */
+        #music-note {
+            position: absolute;
+            bottom: 12px;
+            left: calc(50% + 90px);
+            font-size: 22px;
+            pointer-events: none;
+            z-index: 11;
+            animation: note-bounce 1.8s ease-in-out infinite;
+            transform-origin: bottom center;
+        }
+        @keyframes note-bounce {
+            0%,100% { transform: translateY(0)    rotate(-10deg) scale(1);    opacity: 0.65; }
+            40%     { transform: translateY(-18px) rotate(8deg)  scale(1.25);  opacity: 1;    }
+            70%     { transform: translateY(-7px)  rotate(-5deg) scale(0.95);  opacity: 0.8;  }
+        }
+
         /* ── 连击提示 ── */
         #combo {
             position: absolute;
@@ -288,6 +305,7 @@
         </svg>
     </div>
 
+    <span id="music-note" aria-hidden="true">🎵</span>
     <canvas id="canvas"></canvas>
     <div id="hint">点击番茄 · 快速连击可获得连击奖励</div>
 </div>
@@ -485,7 +503,7 @@
             pointer-events:none; z-index:200; display:none;
             animation: frenzy-pulse 0.25s ease-in-out infinite alternate;
         `;
-        el.textContent = '🤪 发疯中！';
+        el.textContent = '🤪 ！！！';
         app.appendChild(el);
         return el;
     })();
@@ -505,7 +523,7 @@
         // 倒计时更新
         let remaining = 5;
         const tick = () => {
-            frenzyLabel.textContent = `🤪 发疯中！${remaining}s`;
+            frenzyLabel.textContent = `🤪 ！！！${remaining}s`;
             remaining--;
             if (remaining >= 0) frenzyTimer = setTimeout(tick, 1000);
             else { frenzyLabel.style.display = 'none'; }
@@ -640,21 +658,84 @@
         osc.connect(g2); g2.connect(ac.destination); osc.start(t); osc.stop(t + 0.15);
     }
 
-    // 豆芽跳跃音：卡通 boing 弹跳
+    // 豆芽点击音：竖琴琶音「We Will Rock You」~10s 循环
+    const _harp = { alive: false, stop: null };
+
     function sndBoing() {
         resume();
-        const t = ac.currentTime;
-        const osc = ac.createOscillator(); osc.type = 'sine';
-        osc.frequency.setValueAtTime(220, t);
-        osc.frequency.exponentialRampToValueAtTime(660, t + 0.08);
-        osc.frequency.exponentialRampToValueAtTime(300, t + 0.22);
-        const g = ac.createGain(); g.gain.setValueAtTime(0.35, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
-        osc.connect(g); g.connect(ac.destination); osc.start(t); osc.stop(t + 0.28);
-        // 豆子弹出小音
-        const osc2 = ac.createOscillator(); osc2.type = 'triangle';
-        osc2.frequency.setValueAtTime(800, t + 0.05); osc2.frequency.exponentialRampToValueAtTime(300, t + 0.2);
-        const g2 = ac.createGain(); g2.gain.setValueAtTime(0.18, t + 0.05); g2.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
-        osc2.connect(g2); g2.connect(ac.destination); osc2.start(t + 0.05); osc2.stop(t + 0.22);
+        if (_harp.stop) { _harp.stop(); }
+
+        // 预建大厅混响脉冲（只建一次供循环复用）
+        const rLen = Math.floor(ac.sampleRate * 2.2);
+        const rBuf = ac.createBuffer(2, rLen, ac.sampleRate);
+        for (let ch = 0; ch < 2; ch++) {
+            const d = rBuf.getChannelData(ch);
+            for (let i = 0; i < rLen; i++)
+                d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / rLen, 1.9);
+        }
+
+        const e = 0.341;   // 8分音符时值（88 BPM），30 * e ≈ 10.2s
+
+        // [频率Hz, 起始8分音符index, 额外延音秒, 音量因子]
+        // 旋律：We(A4) will(A4) · we(A4) will(A4) · ROCK(G4) you(E4) ×2 + 尾声琶音
+        const SEQ = [
+            [440,    0,   1.1, 1.00],  // A4 "We"
+            [440,    1,   1.1, 1.00],  // A4 "will"
+            [440,    3,   1.1, 1.00],  // A4 "we"    (第3拍，第2拍休=clap)
+            [440,    4,   1.1, 1.00],  // A4 "will"
+            [392,    6,   1.3, 1.10],  // G4 "ROCK"  (第6拍起，第5拍休=clap)
+            [329.63, 8,   1.6, 1.00],  // E4 "you"
+            // 第2组（第15拍起 = 5.12s）
+            [440,    15,  1.1, 1.00],
+            [440,    16,  1.1, 1.00],
+            [440,    18,  1.1, 1.00],
+            [440,    19,  1.1, 1.00],
+            [392,    21,  1.3, 1.15],
+            [329.63, 23,  1.6, 1.00],
+            // 尾声：A小调上行琶音收尾（第27-30拍 ≈ 9.2-10.2s）
+            [220,    27.0, 0.7, 0.50],  // A3
+            [261.63, 27.6, 0.7, 0.60],  // C4
+            [329.63, 28.2, 0.7, 0.72],  // E4
+            [440,    28.8, 1.3, 0.88],  // A4 收尾
+        ];
+
+        _harp.alive = true;
+        const allNodes = [];
+
+        function playOnce() {
+            if (!_harp.alive) return;
+            const t0 = ac.currentTime + 0.03;
+            const rev = ac.createConvolver(); rev.buffer = rBuf;
+            const revG = ac.createGain(); revG.gain.value = 0.36;
+            rev.connect(revG); revG.connect(ac.destination);
+
+            SEQ.forEach(([freq, se, extra, v]) => {
+                const onset = t0 + se * e;
+                const decayT = extra + 0.5;
+                // triangle + 2倍泛音叠加 → 竖琴音色
+                [[freq, 'triangle', 0.23], [freq * 2, 'sine', 0.07]].forEach(([f, type, amp]) => {
+                    const osc = ac.createOscillator(); osc.type = type; osc.frequency.value = f;
+                    const g = ac.createGain();
+                    g.gain.setValueAtTime(0, onset);
+                    g.gain.linearRampToValueAtTime(amp * v, onset + 0.009);
+                    g.gain.exponentialRampToValueAtTime(0.0001, onset + decayT);
+                    osc.connect(g); g.connect(ac.destination); g.connect(rev);
+                    osc.start(onset); osc.stop(onset + decayT + 0.1);
+                    allNodes.push(osc);
+                });
+            });
+
+            const tid = setTimeout(playOnce, 30 * e * 1000);  // ~10.2s 后循环
+            _harp.stop = () => {
+                _harp.alive = false;
+                clearTimeout(tid);
+                const now = ac.currentTime;
+                allNodes.forEach(n => { try { n.stop(now); } catch (_) {} });
+                _harp.stop = null;
+            };
+        }
+
+        playOnce();
     }
 
     // 空白处点击：小火花音
