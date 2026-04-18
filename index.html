@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍅 番茄爆炸</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             width: 100vw;
@@ -72,6 +72,9 @@
             cursor: pointer;
             filter: drop-shadow(0 0 30px rgba(255,60,40,0.6));
             transition: filter 0.3s;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         #tomato-wrap:hover {
             filter: drop-shadow(0 0 50px rgba(255,80,50,0.95));
